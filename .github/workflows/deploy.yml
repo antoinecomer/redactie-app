@@ -1,0 +1,62 @@
+name: Deploy RedactieApp to GitHub Pages
+
+on:
+  # Draai deze workflow elke keer als je pusht naar de main branch
+  push:
+    branches: ["main"]
+
+  # Hiermee kun je de deploy ook handmatig starten via de GitHub tab 'Actions'
+  workflow_dispatch:
+
+# Permissies die nodig zijn voor GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Sta maar één deploy tegelijk toe (voorkomt conflicten)
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Stap 1: Bouwen van de app
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Project
+        run: npm run build
+        env:
+          # CRUCIAAL: Hier injecteren we jouw geheime sleutel in de build
+          # Vite heeft deze nodig TIJDENS het bouwen, niet erna.
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Vite bouwt standaard naar de map 'dist', dus dat uploaden we
+          path: ./dist
+
+  # Stap 2: Live zetten
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
