@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* Basisinstellingen voor de pagina */
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+
+    /* We gebruiken hier standaard CSS (Hex codes) in plaats van @apply */
+    /* Dit voorkomt de "Unknown utility class" crash */
+    background-color: #f9fafb; /* Dit is de kleur van bg-gray-50 */
+    color: #1f2937;            /* Dit is de kleur van text-gray-800 */
+}
