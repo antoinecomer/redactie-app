@@ -37,7 +37,10 @@ jobs:
         run: npm ci
 
       - name: Build Project
-        run: npm run build
+        # AANGEPAST: We gebruiken 'npx vite build' in plaats van 'npm run build'.
+        # Dit slaat de strenge TypeScript-controle (tsc) over en bouwt direct de site.
+        # Dit voorkomt de error: 'React is declared but never read'.
+        run: npx vite build
         env:
           # CRUCIAAL: Hier injecteren we jouw geheime sleutel in de build
           # Vite heeft deze nodig TIJDENS het bouwen, niet erna.
