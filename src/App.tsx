@@ -3,13 +3,22 @@ import React, { useState, useMemo } from 'react';
 // API Key setup (wordt runtime ingevuld door de omgeving)
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-const App = () => {
-    const [markdownInput, setMarkdownInput] = useState<string>(
-        '# Welkom bij de RedactieApp Studio\n\nDit is een **voorbeeldnieuwsbrief**.\n\n* Typ hier links\n* Zie rechts het resultaat\n\nGebruik de AI-knoppen hierboven om de magie te testen! ✨'
-    );
+const DEFAULT_TEXT = '# Welkom bij de RedactieApp Studio\n\nDit is een **voorbeeldnieuwsbrief**.\n\n* Typ hier links\n* Zie rechts het resultaat\n\nGebruik de AI-knoppen hierboven om de magie te testen! ✨';
 
+const App = () => {
+    const [markdownInput, setMarkdownInput] = useState<string>(DEFAULT_TEXT);
+    
     const [isMobileView, setIsMobileView] = useState<boolean>(true);
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
+
+    // UX FEATURE: Maak het veld leeg zodra de gebruiker erin klikt/tikt
+    // Maar alléén als de huidige tekst nog steeds de standaardtekst is.
+    const handleFocus = () => {
+        if (markdownInput === DEFAULT_TEXT) {
+            setMarkdownInput('');
+        }
+    };
+
 
     // --- GEMINI API INTEGRATIE ---
     const callGemini = async (promptType: 'title' | 'push' | 'shorten') => {
@@ -144,6 +153,7 @@ const App = () => {
                         className="w-full flex-grow p-4 border rounded-lg shadow-inner font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none min-h-[500px]"
                         value={markdownInput}
                         onChange={(e) => setMarkdownInput(e.target.value)}
+                        onFocus={handleFocus} 
                     />
                 </div>
 
